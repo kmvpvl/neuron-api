@@ -4,6 +4,8 @@ import OpenAPIBackend from "openapi-backend";
 import { UUID } from "crypto";
 import cors from 'cors';
 import NeuronError from "./model/error";
+import { User } from "./model/user";
+import { newuser } from "./api/user";
 
 var npm_package_version = require('../package.json').version;
 dotenv.config();
@@ -15,14 +17,15 @@ const api = new OpenAPIBackend({
 api.init();
 
 api.register({
-    version:  async (c, req, res, org, roles) => {return res.status(200).json({version: npm_package_version})},
-    validationFail: async (c, req, res, org, roles) => res.status(400).json({ err: c.validation.errors }),
-    notFound: async (c, req, res, org, roles) => res.status(404).json({c}),
-    notImplemented: async (c, req, res, org, roles) => res.status(500).json({ err: 'not implemented' }),
-    unauthorizedHandler: async (c, req, res, org, roles) => res.status(401).json({ err: 'not auth' })
+    version:  async (c, req, res, user, roles) => {return res.status(200).json({version: npm_package_version})},
+    newuser: async(c, req, res, user, roles) => await newuser(c, req, res, user),
+    validationFail: async (c, req, res, user, roles) => res.status(400).json({ err: c.validation.errors }),
+    notFound: async (c, req, res, user, roles) => res.status(404).json({c}),
+    notImplemented: async (c, req, res, user, roles) => res.status(500).json({ err: 'not implemented' }),
+    unauthorizedHandler: async (c, req, res, user, roles) => res.status(401).json({ err: 'not auth' })
 });
 
-api.registerSecurityHandler('NeuronUserId', async (context, req, res, user)=> {
+api.registerSecurityHandler('NeuronUserName', async (context, req, res, user)=> {
     return user !== undefined;
 });
 
@@ -38,18 +41,17 @@ app.use(cors());
 const PORT = process.env.PORT || 8000;
 
 app.use(async (req, res) => {
-    let user: any;
-    const userid = req.headers['neuron_userid'] as string;
+    let user: User | null;
+    const username = req.headers['neuron_username'] as string;
     const authtoken = req.headers['neuron_authtoken'] as UUID;
-    console.log(`-----\n✅ [${req.method}:${req.originalUrl}] headers organizationid='${userid}'; authtoken='${authtoken}'`);
+    console.log(`-----\n✅ [${req.method}:${req.originalUrl}] headers organizationid='${username}'; authtoken='${authtoken}'`);
     try {
-        // !!! must create user here;
-        const user = {};
+        user = await User.getUserByName(username, authtoken);
         console.log(`✅ Login successed`);
     } catch (e) {
         console.log(`🚫 Login failed`);
         //return res.status(401).json({err: "login failed"})
-        user = undefined;
+        user = null;
     }
     try {
         return await api.handleRequest({
@@ -57,10 +59,10 @@ app.use(async (req, res) => {
             path: req.path,
             body: req.body,
             headers: {
-                'neuron_userid': userid,
+                'neuron_username': username,
                 'neuron_authtoken': authtoken
             }
-        }, req, res, user, );
+        }, req, res, user);
     } 
     catch (e) {
         if (e instanceof NeuronError) {

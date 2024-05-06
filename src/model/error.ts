@@ -2,7 +2,8 @@ export type ErrorCode =
 "client:unknown" 
 | "user:notfound"
 | "settings:mongouriundefined"
-| "forbidden:roleexpected";
+| "forbidden:roleexpected"
+| "user:couldnotcreate";
 
 export default class NeuronError extends Error {
     private code: ErrorCode;

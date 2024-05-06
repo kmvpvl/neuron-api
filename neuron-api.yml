@@ -9,14 +9,15 @@ servers:
     description: Debug server
 components:
   securitySchemes:
-    NeuronUserId:
+    NeuronUserName:
       type: apiKey
       in: header
-      name: neuron_userid
+      name: neuron_username
     NeuronAuthToken:
       type: apiKey
       in: header
       name: neuron_authtoken
+    
 paths:
   /version:
     get:
@@ -29,6 +30,33 @@ paths:
             application/json:
               schema:
                 type: object
+  /newuser:
+    post:
+      operationId: newuser
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+              required:
+                - "username"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authtoken:
+                    type: string
+                required:
+                  - "authtoken"
+            
 security:
-  - NeuronUserId: []
+  - NeuronUserName: []
     NeuronAuthToken: []
