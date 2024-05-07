@@ -5,7 +5,7 @@ import { UUID } from "crypto";
 import cors from 'cors';
 import NeuronError from "./model/error";
 import { User } from "./model/user";
-import { newuser } from "./api/user";
+import { isusernamefree, newuser } from "./api/user";
 
 var npm_package_version = require('../package.json').version;
 dotenv.config();
@@ -18,6 +18,7 @@ api.init();
 
 api.register({
     version:  async (c, req, res, user, roles) => {return res.status(200).json({version: npm_package_version})},
+    isusernamefree: async(c, req, res, user, roles) => await isusernamefree(c, req, res, user),
     newuser: async(c, req, res, user, roles) => await newuser(c, req, res, user),
     validationFail: async (c, req, res, user, roles) => res.status(400).json({ err: c.validation.errors }),
     notFound: async (c, req, res, user, roles) => res.status(404).json({c}),

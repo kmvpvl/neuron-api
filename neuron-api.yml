@@ -30,6 +30,27 @@ paths:
             application/json:
               schema:
                 type: object
+  /isusernamefree:
+    post:
+      operationId: isusernamefree
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+              required:
+                - "username"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
   /newuser:
     post:
       operationId: newuser

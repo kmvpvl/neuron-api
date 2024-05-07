@@ -6,10 +6,14 @@ import NeuronError from "./error";
 export interface IUser {
     name: string;
     hash: string;
+    created: Date;
+    changed?: Date;
 }
 const UserSchema = new Schema({
     name: {type: String, required: true},
     hash: {type: String, required: true},
+    created: {type: Date, required: true},
+    changed: {type: Date, required: false}
 });
 
 const modelUser = model<IUser>('users', UserSchema);
@@ -22,12 +26,19 @@ export class User extends MongoProto<IUser> {
         MongoProto.connectMongo();
         const hash = Md5.hashStr(`${name} ${authtoken}`);
         const userraw = await modelUser.aggregate([
-            {$match: {"hash": {hash}}}
+            {$match: {"hash": hash}}
         ]);
         if (userraw.length === 1) {
             const user = new User(undefined, userraw[0]);
             await user.load();
         }
         throw new NeuronError("user:notfound", `User '${name}' not found or password incorrect`);
+    }
+    public static async isusernamefree(username: string): Promise<boolean> {
+        MongoProto.connectMongo();
+        const userraw = await modelUser.aggregate([
+            {'$match': {'name': username}}
+        ]);
+        return userraw.length !==1;
     }
 }
