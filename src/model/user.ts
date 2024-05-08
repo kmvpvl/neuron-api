@@ -31,6 +31,7 @@ export class User extends MongoProto<IUser> {
         if (userraw.length === 1) {
             const user = new User(undefined, userraw[0]);
             await user.load();
+            return user;
         }
         throw new NeuronError("user:notfound", `User '${name}' not found or password incorrect`);
     }

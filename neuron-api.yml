@@ -77,7 +77,41 @@ paths:
                     type: string
                 required:
                   - "authtoken"
-            
+  /loadbrain:
+    post:
+      operationId: loadbrain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brainname:
+                  type: string
+              required:
+                - "brainname"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+  /savebrain:
+    post:
+      operationId: savebrain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
 security:
   - NeuronUserName: []
     NeuronAuthToken: []
