@@ -5,7 +5,7 @@ import { UUID } from "crypto";
 import cors from 'cors';
 import NeuronError from "./model/error";
 import { User } from "./model/user";
-import { isusernamefree, newuser } from "./api/user";
+import { brainlist, isusernamefree, newuser } from "./api/user";
 import { loadbrain, savebrain } from "./api/brain";
 
 var npm_package_version = require('../package.json').version;
@@ -21,6 +21,7 @@ api.register({
     version:  async (c, req, res, user, roles) => {return res.status(200).json({version: npm_package_version})},
     isusernamefree: async(c, req, res, user, roles) => await isusernamefree(c, req, res, user),
     newuser: async(c, req, res, user, roles) => await newuser(c, req, res, user),
+    brainlist: async(c, req, res, user, roles) => await brainlist(c, req, res, user),
     loadbrain: async(c, req, res, user, roles) => await loadbrain(c, req, res, user),
     savebrain: async(c, req, res, user, roles) => await savebrain(c, req, res, user),
     validationFail: async (c, req, res, user, roles) => res.status(400).json({ err: c.validation.errors }),

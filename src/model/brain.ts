@@ -23,10 +23,12 @@ export interface INeuron {
     _learnCount: Array<number>;
     _W: Array<Array<number>>;
     _ANames: Array<string>;
+    _layer?: number;
 }
 
 export interface IBrain {
     username: string;
+    name: string;
     neurons: Array<INeuron>;
     created: Date;
     changed?: Date;
@@ -34,12 +36,13 @@ export interface IBrain {
 
 const BrainSchema = new Schema({
     username: {type: String, required: true},
+    name: {type: String, required: true},
     neurons: {type: Array, required: true},
     created: {type: Date, required: true},
     changed: {type: Date, required: false}
 });
 
-const modelBrain = model<IBrain>('brains', BrainSchema);
+export const modelBrain = model<IBrain>('brains', BrainSchema);
 
 export class Brain extends MongoProto<IBrain> {
     constructor (id?: Types.ObjectId, data?: IBrain){
@@ -47,7 +50,7 @@ export class Brain extends MongoProto<IBrain> {
     }
     static async loadBrain(username: string, brainname: string): Promise<Brain> {
         const rawBrains = await modelBrain.aggregate([{
-            "$match": {"username": username}
+            "$match": {"username": username, "name": brainname}
         }]);
         if (rawBrains.length === 1) {
             const ret = new Brain(undefined, rawBrains[0]);

@@ -7,7 +7,9 @@ import NeuronError from "../model/error";
 import { Md5 } from "ts-md5";
 import { Brain, IBrain } from "../model/brain";
 export async function loadbrain(c: Context, req: Request, res: Response, user:User){
-    const b = await Brain.loadBrain(user.json?.name as string, "");
+    const brainname: string = req.body.brainname;
+    console.log(`brainname = '${brainname}'`)
+    const b = await Brain.loadBrain(user.json?.name as string, brainname);
     res.status(200).json(b.json);
 }
 export async function savebrain(c: Context, req: Request, res: Response, user:User){
@@ -15,7 +17,7 @@ export async function savebrain(c: Context, req: Request, res: Response, user:Us
     console.log(`brain = '${JSON.stringify(braindata)}'`);
     let b: Brain;
     try {
-        b = await Brain.loadBrain(user.json?.name as string, "");
+        b = await Brain.loadBrain(user.json?.name as string, braindata.name);
         const ib = b.json as IBrain; 
         ib.neurons = braindata.neurons;
         ib.changed = new Date();
@@ -23,6 +25,7 @@ export async function savebrain(c: Context, req: Request, res: Response, user:Us
     } catch (e) {
         const ib: IBrain = {
             username: user.json?.name as string,
+            name: braindata.name,
             neurons: braindata.neurons,
             created: new Date(),
         }

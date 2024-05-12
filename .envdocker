@@ -1,0 +1,2 @@
+PORT=8001
+mongouri=mongodb://neuron-mongo-database:27017/NEURON

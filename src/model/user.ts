@@ -2,6 +2,7 @@ import { Schema, Types, model } from "mongoose";
 import MongoProto from "./mongoproto";
 import { Md5 } from "ts-md5";
 import NeuronError from "./error";
+import { modelBrain } from "./brain";
 
 export interface IUser {
     name: string;
@@ -41,5 +42,13 @@ export class User extends MongoProto<IUser> {
             {'$match': {'name': username}}
         ]);
         return userraw.length !==1;
+    }
+
+    public async brainList(): Promise<Array<string>> {
+        MongoProto.connectMongo();
+        const brains = await modelBrain.aggregate([
+            {"$match": {"username": this.json?.name}}
+        ]);
+        return brains.flatMap(v=>v.name);
     }
 }

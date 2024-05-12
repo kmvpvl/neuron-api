@@ -77,6 +77,16 @@ paths:
                     type: string
                 required:
                   - "authtoken"
+  /brainlist:
+    post:
+      operationId: brainlist
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
   /loadbrain:
     post:
       operationId: loadbrain
